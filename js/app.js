@@ -41,9 +41,9 @@ Seguro.prototype.cotizarSeguro = function () {
      * Si el seguro es completo, se multiplica por un 50% mas.
      */
 
-    if(this.tipo === 'basico'){
+    if (this.tipo === 'basico') {
         cantidad *= 1.30;
-    }else{
+    } else {
         cantidad *= 1.50;
     }
 
@@ -90,6 +90,52 @@ UI.prototype.mostrarMensaje = function (mensaje, tipo) {
     }, 3000);
 };
 
+UI.prototype.mostrarResultado = function (seguro, total) {
+    const {
+        marca,
+        anio,
+        tipo
+    } = seguro;
+
+    switch (marca) {
+        case '1':
+            textoMarca = 'Americano';
+            break;
+        case '2':
+            textoMarca = 'Asiatico';
+            break;
+        case '3':
+            textoMarca = 'Europeo';
+            break;
+        default:
+            break;
+    }
+
+    // Crear el resultado
+    const div = document.createElement('DIV');
+    div.classList.add('mt-10');
+
+    div.innerHTML = `
+        <p class="header"> Tu Resumen</p>
+        <p class="font-bold">Marca: <span class="font-normal">${textoMarca}</span></p>
+        <p class="font-bold">Año: <span class="font-normal">${anio}</span></p>
+        <p class="font-bold">Tipo seguro: <span class="font-normal capitalize">${tipo}</span></p>
+        <p class="font-bold">Total: <span class="font-normal">$${total}</span></p>
+    `;
+
+    const resultadoDiv = document.querySelector('#resultado');
+
+    // Mostrar el spinner
+    const spinner = document.querySelector('#cargando');
+    spinner.style.display = 'block';
+
+    setTimeout(() => {
+        spinner.style.display = "none"; // Se borra el spinner y se muestra el resultado
+
+        resultadoDiv.appendChild(div);
+    }, 3000);
+}
+
 // Instanciar UI
 const ui = new UI();
 
@@ -123,9 +169,17 @@ function cotizarSeguro(e) {
 
     ui.mostrarMensaje('Cotizando...', 'exito');
 
+    // Ocultar las cotizaciones previas
+    const resultados = document.querySelector('#resultado div');
+
+    if (typeof resultados != 'undefined' && resultados != null) {
+        resultados.remove();
+    }
+
     // Instanciar el seguro
     const seguro = new Seguro(marca, anio, tipo);
+    const total = seguro.cotizarSeguro();
 
-    seguro.cotizarSeguro();
     // Utilizar el prototype
+    ui.mostrarResultado(seguro, total);
 }
